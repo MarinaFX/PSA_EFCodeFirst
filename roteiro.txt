@@ -1,0 +1,56 @@
+Roteteiro - Criar uma aplicacao Web e ligar ao projeto de console
+
+1. Sobre a solucao utilizar a opcao Adicionar/Novo Projeto
+   - selecionar o template Aolicativo Asp.Net Core - C#
+   - em seguida selecionar o template Aplicativo Web (Modelo - Visao - Controlador)
+
+2. E necessario que este novo projeto "veja" a camada de persitencia/negocio
+   - no item Dependencias use a opcao "Adicionar Referencia" e seleciono o projeto ExercicioEFCoreCodeFirst"
+
+3. Na camada de persitencia eh neessario acrescentar um construtor ao contexto do entity framework para a Injecao de Dependencias
+   
+   (verifique que isto jah esta feito)
+
+   public MovieContext(DbContextOptions<MovieContext> opt) : base(opt) { }
+
+   // este construtor eh usado apenas para o programa de teste
+   public MovieContext() { }
+
+4. Adicionar um controlador para acesso a uma das classes de modelo
+   - na pasta Controllers selcecione a opcao Adicionar Controlador
+   - utilize o template Controlador MVC com exibicoes, utiliozando o EF
+   - selecine a classe de modelo "Genre" e o contexto "MovieContext"
+
+5. Navegue pelo codigo criado e veja o uso do EF nas operacoes de CRUD
+   - olhe tambem os arquivos criaos na pasta Views/Genres
+
+6. O controlador gerado (GenresController) utiliza injecao de dependencia para o contexto
+   - abra o arquivo Startup.cs e acrescente ao metodo ConfigureServices o codigo:
+
+    services.AddDbContext<MovieContext>(options => 
+            options.UseSqlServer(Configuration.GetConnectionString("MovieContext")));
+
+   - sera necessario adicionar os namespaces:
+
+   using ExercicioEFCoreCodeFirst.PL; 
+   using Microsoft.EntityFrameworkCore;
+
+ 
+ 7. Acrescente a string de conexao as cofiguracoes da app
+   - abra o arquivo appsetting.jaso e acrescente:
+
+     "ConnectionStrings": { "MovieContext": "Server=(localdb)\\MSSQLLocalDB;Database=DBMovieCF;Trusted_Connection=True;" },
+
+ 8. Selecione o projeto e ative a opcao Definir como projeto de inicializacao
+
+ 9. Para testar a aplicacao execute o projeto e altere a URL para /Genres
+
+
+ Exercicio - Adicionar uma camada de negocio (na pasta BLL do prjeto ExercioEFCoreCodeFirst)
+ 
+ - a fachada deve ser o unico ponto de comunicacao da camada de apresentacao 
+ - utilize o padrao DAO para isolar a camada de persitencia
+ - altere o controlador para fazer uso da camada de negocio
+
+
+
