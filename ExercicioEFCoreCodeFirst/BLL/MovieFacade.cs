@@ -16,9 +16,15 @@ namespace ExercicioEFCoreCodeFirst.BLL
             movieDAO = new GenreDAO();
         }
 
-        public void addGenre(Genre genre)
+        public Task<List<Genre>> Index()
         {
-            movieDAO.CreateAsync(genre);
+            var list = movieDAO.Index();
+            return list;
+        }
+
+        public async Task addGenreAsync(Genre genre)
+        {
+            await movieDAO.CreateAsync(genre);
         }
 
         public async System.Threading.Tasks.Task<Genre> editAsync(int? id)
@@ -47,6 +53,11 @@ namespace ExercicioEFCoreCodeFirst.BLL
         public async Task DeleteConfirmedAsync(int? id)
         {
             await movieDAO.DeleteConfirmedAsync(id);
+        }
+
+        public bool GenreExists (int id)
+        {
+            return movieDAO.GenreExists(id);
         }
     }
 }

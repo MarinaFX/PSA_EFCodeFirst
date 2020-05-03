@@ -21,152 +21,76 @@ namespace ExercicioEFCoreCodeFirst
                 }
                 #endregion
 
-                #region #operações de crud
-                //////Adicionar um novo filme
-                ////Console.WriteLine("Adicionando um novo filme");
-                ////Movie teste = new Movie
-                ////{
-                ////    Title = "Logan",
-                ////    Director = "James Mangold",
-                ////    Rating = 8.5,
-                ////    ReleaseDate = new DateTime(2017, 03, 24),
-                ////    GenreID = 1
-                ////};
-                ////db.Movies.Add(teste);
-                ////Console.WriteLine("Id de teste: " + teste.MovieID);
+                #region consultas
 
-                //////Remover o primeiro filme consultado
-                ////Console.WriteLine("Removendo um filme");
-                ////var todosFilmes = db.Movies.ToList();
-                ////db.Movies.Remove(todosFilmes[0]);
+                MovieContext context = new MovieContext();
 
-                //////Atualizar os dados de um filme
-                ////Console.WriteLine("Atualizando um filme");
-                ////Movie batman = todosFilmes.Where(f => f.Title == "The Dark Knight").FirstOrDefault();
-                ////if (batman != null)
-                ////{
-                ////    batman.Title = "Batman - " + batman.Title;
-                ////}
-                //////Persistir as alterações (verifique o SQL gerado)
-                ////db.SaveChanges();
-                ////Console.WriteLine("Id de teste: " + teste.MovieID);
-                ////Console.ReadKey();
+                //Consulta 1 - Listar elenco de um filme.
+                var StarWarsCast = from c in context.Characters
+                                   where c.Movie.Title == "Star Wars"
+                                   select c.Actor.Name;
 
+                Console.WriteLine(" ");
+                Console.WriteLine("Elenco de Star Wars: ");
+                foreach (String actorName in StarWarsCast)
+                {
+                    Console.WriteLine(actorName);
+                }
+
+                //Consulta 2 - Listar todos os atores que já desempenharam um determinado personagem.
+                var jamesBondActors = (from c in context.Characters
+                                       where c.Character == "James Bond"
+                                       select c.Actor.Name).Distinct();
+
+                Console.WriteLine(" ");
+                Console.WriteLine("Atores que viveram James Bond: ");
+                foreach (String actorName in jamesBondActors)
+                {
+                    Console.WriteLine(actorName);
+                }
+
+                //Consulta 3 - Informar qual o ator desempenhou mais vezes um determinado personagem.
+                var mostActedAsJamesBond = (from c in context.Characters
+                                            where c.Character == "James Bond"
+                                            group c by c.Actor.Name into ActorAsCharacter
+                                            orderby ActorAsCharacter.Count() descending
+                                            select ActorAsCharacter.Key).First();
+
+                Console.WriteLine(" ");
+                Console.WriteLine("O ator que mais atuou como James Bond foi: ");
+                Console.WriteLine(mostActedAsJamesBond);
+
+                //Consultas opcionais:
+
+                //Consulta 4 - Filmes tem o rating maior que 8.4.
+                Console.WriteLine("\nFilmes tem o rating maior que 8.4");
+                var filmesRating = from f in context.Movies
+                                   where f.Rating > 8.40
+                                   select new { f.Title, f.Rating };
+
+                foreach (var filme in filmesRating)
+                {
+                    Console.WriteLine(filme);
+                }
+
+                //Consulta 5 - Todos os diretores que estiveram em mais de um filme de ação.
+                var actionDirector = from m in context.Movies
+                                     where m.Genre.Name == "Action"
+                                     select m.Director;
+
+                Console.WriteLine(" ");
+                Console.WriteLine("Todos os diretores que fizeram filmes de ação: ");
+                foreach (var directorName in actionDirector)
+                {
+                    Console.WriteLine(directorName);
+                }
+
+                Console.ReadKey();
                 #endregion
 
-                //////    Console.ReadKey();
-                ////// }
+                #region consultasPadrao
+                //Consultas padrões
 
-                #region - CRUD2
-
-                //// crud - adiciona na um novo filme à coleção
-                ////        remove o primeiro filme do banco
-                ////        atualiza os dados de um filme
-                //using (var contexto = new MovieContext())
-                //    {
-                //        var listaFilmes = contexto.Movies.ToList();
-
-                //        // insert
-                //        contexto.Movies.Add(new Movie()
-                //        {
-                //            Title = "Logan2",
-                //            Director = "James Mangold",
-                //            Rating = 8.5,
-                //            ReleaseDate = new DateTime(2017, 03, 24),
-                //            GenreID = 1
-                //        });
-
-                //        // edit
-                //        Movie batman = listaFilmes.Where(f => f.Title == "The Dark Knight").FirstOrDefault<Movie>();
-                //        if (batman != null)
-                //            batman.Title = "Batman - " + batman.Title;
-
-                //        // delete
-                //        contexto.Movies.Remove(listaFilmes.ElementAt<Movie>(0));
-
-                //        // persistir
-                //        contexto.SaveChanges();
-                //    }
-
-
-                // lista todos os generos
-                //// using (var contexto = new MovieContext())
-                //// {
-                ////     contexto.Database.Log = Console.Write;
-
-                ////     Console.WriteLine("Todos os generos");
-                ////     foreach (Genre genero in contexto.Genres)
-                ////     {
-                ////         Console.WriteLine("{0} \t {1}", genero.GenreID, genero.Name);
-
-                ////     }
-                //// }
-
-                //// Console.WriteLine("\n");
-                //// lista todos os filmes do genero "Action"
-                //// using (var contexto = new MovieContext())
-                //// {
-                ////     contexto.Database.Log = Console.Write;
-                ////     Genre genero = contexto.Genres.Find(1);
-                ////     if (genero != null)
-                ////     {
-                ////         Console.WriteLine("\nFilmes do genero: " + genero.Name);
-                ////         foreach (Movie filme in genero.Movies)
-                ////         {
-                ////             Console.WriteLine("\t{0}", filme.Title);
-
-                ////         }
-                ////     }
-                //// }
-
-                //// gera uma exceção pois o contexto não está disponível
-                //// Console.WriteLine("\nDesconectado...\n");
-                //// MovieContext cntx = new MovieContext();
-                //// cntx.Database.Log = Console.Write;
-                //// Genre action = cntx.Genres.Find(1);
-                //// cntx.Dispose();
-                //// if (action != null)
-                //// {
-                ////     Console.WriteLine("\nFilmes do genero: " + action.Name);
-
-                ////     foreach (Movie filme in action.Movies)
-                ////     {
-                ////         Console.WriteLine("\t{0}", filme.Title);
-                ////     }
-                //// }
-
-
-                //// Desconectato
-                ////MovieContext cntx = new MovieContext();
-                //// cntx.Database.Log = Console.Write;
-                //// List<Genre> generos = cntx.Genres.ToList<Genre>();
-                //// cntx.Dispose();
-                //// foreach (Genre genero in generos)
-                //// {
-                ////     Console.WriteLine("{0} \t {1}", genero.GenreID, genero.Name);
-                //// }
-
-                //// cntx = new MovieContext();
-                //// cntx.Database.Log = Console.Write;
-                //// var action = cntx.Genres.Find(1);
-                //// var action2 = cntx.Genres.Include("Movies").Where(g => g.GenreID == 1).FirstOrDefault();
-                //// cntx.Dispose();
-                //// if (action2 != null)
-                //// {
-                ////     Console.WriteLine("{0} \t {1}", action2.Name, action2.Description);
-                ////     foreach (Movie filme in action2.Movies)
-                ////     {
-                ////         Console.WriteLine("\t{0}", filme.Title);
-                ////     }
-                //// }
-
-                //// Console.ReadKey()
-
-                #endregion
-
-                #region - consultas
-
-                //MovieContext context = new MovieContext();
                 // filmes do diretor “Quentin Tarantino”
                 //var query1 = from f in context.Movies
                 //             where f.Director == "Quentin Tarantino"
@@ -180,14 +104,15 @@ namespace ExercicioEFCoreCodeFirst
                 //                      .Where(f => f.Director == "Quentin Tarantino")
                 //                      .Select(f => f.Title);
 
+                //Console.WriteLine("\nQuery 1");
                 //Console.WriteLine("Filmes do diretor Quentin Tarantino");
                 //foreach (String titulo in query2)
                 //{
                 //    Console.WriteLine(titulo);
                 //}
 
-
-                //todos os filmes do genero "Action"
+                //Console.WriteLine("Query 2");
+                ////todos os filmes do genero "Action"
                 //Console.WriteLine("\nFilmes de ação");
                 //var query4 = (from genero in context.Genres
                 //                                   .Include("Movies")
@@ -199,6 +124,7 @@ namespace ExercicioEFCoreCodeFirst
                 //    Console.WriteLine("\t" + filme.Title);
                 //}
 
+                //mesma consulta, mas de maneira diferente. Estamos consultando a tabela filme por meio do context.Movies em que o nome do genero do filme é action e estamos mostrando o titulo do filme
                 //var query4b = (from filme in context.Movies
                 //               where filme.Genre.Name == "Action"
                 //               select filme);
@@ -210,7 +136,7 @@ namespace ExercicioEFCoreCodeFirst
 
 
 
-
+                //Console.WriteLine("Query 3");
                 //projeção sobre o título e dada de lançamento dos
                 //filmes do diretor “Quentin Tarantino” 
                 //var query5 = from f in context.Movies
@@ -224,6 +150,7 @@ namespace ExercicioEFCoreCodeFirst
                 //        filme.Titulo);
                 //}
 
+                //Console.WriteLine("Query 4");
                 // Gêneros ordenados pelo nome
                 //var query6 = from g in context.Genres
                 //             orderby g.Name descending
@@ -234,6 +161,7 @@ namespace ExercicioEFCoreCodeFirst
                 //    Console.WriteLine("{0}\t {1}", genero.Name, genero.Description);
                 //}
 
+                //Console.WriteLine("Query 5");
                 //Filmes agrupados pelo ano de lançamento
                 //var query7a = context.Movies.ToList();
                 //var query7 = from f in query7a
@@ -250,6 +178,7 @@ namespace ExercicioEFCoreCodeFirst
                 //    }
                 //}
 
+                //Console.WriteLine("Query 6");
                 //Projeção do faturamento total, quantidade de filmes
                 //e avaliação média agrupadas por gênero
                 //var query8a = context.Movies.ToList();
@@ -264,13 +193,13 @@ namespace ExercicioEFCoreCodeFirst
                 //                 Quantidade = grpGen.Count()
                 //             };
 
+
                 //foreach (var genero in query8)
                 //{
                 //    Console.WriteLine("\nGenero: {0}", genero.Categoria);
                 //    Console.WriteLine("\tFaturamento total: {0}\n\t Avaliação média: {1}\n\tNumero de filmes: {2}",
                 //                        genero.Faturamento, genero.Avaliacao, genero.Quantidade);
                 //    Console.WriteLine("Filmes: ");
-
                 //    foreach (var m in genero.Filmes)
                 //    {
                 //        Console.WriteLine("\t{0}", m.Title);
@@ -278,47 +207,8 @@ namespace ExercicioEFCoreCodeFirst
                 //}
                 //Console.ReadKey();
                 #endregion
-
-                #region - consultas com casting
-                MovieContext cntx2 = new MovieContext();
-
-                Console.WriteLine("\nElenco de Star Wars");
-                var query9 = from p in cntx2.Characters.Include("Movie").Include("Actor")
-                             where p.Movie.Title == "Star Wars"
-                             select p;
-
-                foreach (var res in query9)
-                {
-                    Console.WriteLine("\t{0}\t {1}", res.Character, res.Actor.Name);
-                }
-
-                Console.WriteLine("\nAtores que desempenharam James Bond");
-                var query10 = from p in cntx2.Characters.Include("Movie").Include("Actor")
-                              where p.Character == "James Bond"
-                              orderby p.Movie.ReleaseDate.Year
-                              select p;
-
-                foreach (var res in query10)
-                {
-                    Console.WriteLine("\t{0}\t {1}\t {2}", res.Movie.ReleaseDate.Year, res.Actor.Name, res.Movie.Title);
-                }
-
-
-
-                #endregion
-
-
-
-
             }
         }
-
-
-
-
-
-
-
 
         private static void Seed(MovieContext context)
         {
@@ -340,7 +230,6 @@ namespace ExercicioEFCoreCodeFirst
                     new Genre { Name = "Thriller",  Description = "A Thriller is a story that is usually a mix of fear and excitement. It has traits from the suspense genre and often from the action, adventure or mystery genres, but the level of terror makes it borderline horror fiction at times as well. " },
                     new Genre { Name = "Family",  Description = "The family saga is a genre of literature which chronicles the lives and doings of a family or a number of related or interconnected families over a period of time. " }
                  };
-
 
             context.Genres.AddRange(genres);
             context.SaveChanges();
@@ -378,11 +267,7 @@ namespace ExercicioEFCoreCodeFirst
                 new Movie { Title = "2001: A Space Odyssey", Director = "Stanley Kubrick", ReleaseDate = DateTime.Parse("4/29/1968",new CultureInfo("en-US")), GenreID =  genres.Single( g => g.Name == "Sci-Fi").GenreID,Gross = 56715371, Rating = 8.3 },
                 new Movie { Title = "Back to the Future", Director = "Robert Zemeckis", ReleaseDate = DateTime.Parse("1/22/1989",new CultureInfo("en-US")), GenreID =  genres.Single( g => g.Name == "Family").GenreID,Gross = 210609762, Rating = 8.5},
                 new Movie { Title = "Monsters Inc", Director = "Pete Docter & David Silverman", ReleaseDate = DateTime.Parse("11/2/2001",new CultureInfo("en-US")), GenreID =  genres.Single( g => g.Name == "Family").GenreID,Gross = 289907418, Rating = 8.1},
-
-
-
                 new Movie { Title = "Jurassic Park", Director = "Steven Spielberg", ReleaseDate = DateTime.Parse("06/25/1993",new CultureInfo("en-US")), GenreID =  genres.Single( g => g.Name == "Thriller").GenreID,Gross =356784000 , Rating = 8.1},
-
                 new Movie { Title = "The Empire Strikes Back", Director = "Irvin Kershner", ReleaseDate = DateTime.Parse("07/21/1980",new CultureInfo("en-US")), GenreID =  genres.Single( g => g.Name == "Sci-Fi").GenreID,Gross =290158751 , Rating = 8.8},
                 new Movie { Title = "Return of the Jedi", Director = "Richard Marquand", ReleaseDate = DateTime.Parse("06/10/1983",new CultureInfo("en-US")), GenreID =  genres.Single( g => g.Name == "Sci-Fi").GenreID,Gross = 309125409 , Rating = 8.4},
                 new Movie { Title = "GoldenEye", Director = "Martin Campbell", ReleaseDate = DateTime.Parse("12/15/1995",new CultureInfo("en-US")), GenreID =  genres.Single( g => g.Name == "Action").GenreID,Gross =106635996 , Rating = 7.2 },
@@ -449,7 +334,7 @@ namespace ExercicioEFCoreCodeFirst
                       new Actor{ Name = "Eva Green", DateBirth =   DateTime.Parse("7/6/1980",new CultureInfo("en-US")) },
                       new Actor{ Name = "Mads Mikkelsen", DateBirth =   DateTime.Parse("11/22/1965",new CultureInfo("en-US")) },
                       #endregion
-                  };
+            };
 
             //actors.ForEach(s => context.Actors.AddOrUpdate(a => a.Name, s));
             context.Actors.AddRange(actors);
@@ -539,9 +424,6 @@ namespace ExercicioEFCoreCodeFirst
             context.Characters.AddRange(actorCharacters);
             context.SaveChanges();
             #endregion
-
-
-
         }
     }
 

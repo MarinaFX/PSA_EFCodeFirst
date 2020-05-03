@@ -22,7 +22,7 @@ namespace MoviesWeb.Controllers
         // GET: Genres
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Genres.ToListAsync());
+            return View(await facade.Index());
         }
 
         // GET: Genres/Details/5
@@ -61,7 +61,7 @@ namespace MoviesWeb.Controllers
             if (ModelState.IsValid)
             {
                 //chamar fachada aqui
-                facade.addGenre(genre);
+                await facade.addGenreAsync(genre);
                 return RedirectToAction(nameof(Index));
             }
             return View(genre);
@@ -152,7 +152,7 @@ namespace MoviesWeb.Controllers
 
         private bool GenreExists(int id)
         {
-            return _context.Genres.Any(e => e.GenreID == id);
+            return facade.GenreExists(id);
         }
     }
 }
